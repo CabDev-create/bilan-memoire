@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bilan Neurocognitif</title>
+    <!-- Content Security Policy stricte : 100% autonome, zéro fuite réseau -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; connect-src 'none';">
+    <style>
+        :root {
+            /* Palette iOS / Apple / Medical — glassmorphisme */
+            --primary: #007aff;
+            --primary-bg: rgba(0,122,255,0.12);
+            --success: #34c759;
+            --danger: #b91c1c;
+            --danger-hover: #991b1b;
+            --text-main: #1c1c1e;
+            --text-muted: #6e6e73;
+            --border: rgba(255,255,255,0.55);
+            --line: rgba(60,60,67,0.12);
+            --glass: rgba(255,255,255,0.65);
+            --glass-strong: rgba(255,255,255,0.72);
+            --glass-soft: rgba(255,255,255,0.40);
+            --blur: blur(24px) saturate(180%);
+            --radius-card: 22px;
+            --radius-btn: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            padding: 20px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 12% 8%, rgba(0,122,255,0.10) 0, transparent 45%),
+                radial-gradient(circle at 88% 22%, rgba(175,82,222,0.07) 0, transparent 45%),
+                radial-gradient(circle at 20% 78%, rgba(52,199,89,0.06) 0, transparent 45%),
+                radial-gradient(circle at 85% 90%, rgba(90,200,250,0.09) 0, transparent 45%),
+                linear-gradient(160deg, #f5f7fb 0%, #f7f6fb 50%, #f4f8f8 100%);
+            background-attachment: fixed;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        /* Cartes en verre dépoli */
+        .section-card {
+            background: var(--glass);
+            -webkit-backdrop-filter: var(--blur);
+            backdrop-filter: var(--blur);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 24px rgba(31,38,135,0.05), inset 0 1px 0 rgba(255,255,255,0.7);
+            page-break-inside: avoid;
+        }
+        .header-card {
+            background: linear-gradient(135deg, rgba(0,122,255,0.82) 0%, rgba(30,110,235,0.78) 100%);
+            -webkit-backdrop-filter: var(--blur);
+            backdrop-filter: var(--blur);
+            border: 1px solid rgba(255,255,255,0.35);
+            color: white;
+            border-radius: var(--radius-card);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 28px rgba(0,122,255,0.15), inset 0 1px 0 rgba(255,255,255,0.35);
+        }
+        .header-card h1 { font-size: 1.5rem; margin: 0; font-weight: 700; color: white; letter-spacing: -0.02em; }
+        .header-card select { background-color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.6); }
+
+        .btn-reset {
+            background: rgba(255,255,255,0.18);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.45);
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-reset:hover { background: rgba(255,255,255,0.30); }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .section-title { font-size: 1.2rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.01em; }
+        .score-pill {
+            background: var(--glass-strong);
+            border: 1px solid rgba(0,122,255,0.20);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 6px 14px;
+            border-radius: 999px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+        }
+
+        /* Grilles et lignes */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+        @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--line);
+        }
+        .item-row:last-child { border-bottom: none; }
+        .item-label { font-size: 0.95rem; flex: 1; padding-right: 16px; }
+
+        /* Contrôles de formulaire */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-color: var(--glass-strong);
+            border: 1px solid rgba(255,255,255,0.7);
+            border-radius: 10px;
+            padding: 10px 36px 10px 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-align: center;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.8);
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007aff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 16px;
+            min-width: 80px;
+        }
+        select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,122,255,0.18); }
+        .select-large { width: 100%; text-align: left; padding-left: 12px; }
+
+        input[type="number"].num-input {
+            appearance: none;
+            -webkit-appearance: none;
+            background-color: var(--glass-strong);
+            border: 1px solid rgba(255,255,255,0.7);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-align: center;
+            width: 80px;
+            outline: none;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+        }
+        input[type="number"].num-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,122,255,0.18); }
+
+        .box-test {
+            background: var(--glass-soft);
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+        .box-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 8px; color: var(--text-main); }
+
+        /* Checkboxes */
+        .checkbox-card {
+            display: flex;
+            align-items: center;
+            background: var(--glass-soft);
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .checkbox-card:hover { background: var(--glass-strong); }
+        .checkbox-card:has(input:checked) { background: rgba(0,122,255,0.08); border-color: rgba(0,122,255,0.25); }
+        .checkbox-card:active { transform: scale(0.98); }
+        .checkbox-card input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            margin-right: 14px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .checkbox-card span { font-size: 0.95rem; color: var(--text-main); }
+
+        /* Compteurs */
+        .score-counter-card {
+            background: var(--glass-soft);
+            border: 1px solid rgba(0,122,255,0.18);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+        }
+        .score-counter-val { font-size: 1.8rem; font-weight: 800; color: var(--primary); margin: 8px 0; }
+
+        /* Boutons */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 12px 20px;
+            border-radius: var(--radius-btn);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0,122,255,0.30);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover { opacity: 0.92; }
+        .btn-success { background: var(--success); box-shadow: 0 4px 14px rgba(52,199,89,0.30); }
+        .btn-danger { background: var(--danger); box-shadow: 0 4px 14px rgba(185,28,28,0.30); }
+        .btn-danger:hover { background: var(--danger-hover); }
+
+        /* Boîte de commentaires */
+        .comment-box {
+            width: 100%;
+            font-family: inherit;
+            font-size: 0.95rem;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            background: var(--glass-soft);
+            color: var(--text-main);
+            resize: vertical;
+            outline: none;
+            margin-top: 16px;
+        }
+        .comment-box::placeholder { color: var(--text-muted); }
+        .comment-box:focus { border-color: var(--primary); background: var(--glass-strong); box-shadow: 0 0 0 3px rgba(0,122,255,0.15); }
+
+        /* Carte résumé */
+        .summary-card { border: 1.5px solid rgba(0,122,255,0.45); background: rgba(255,255,255,0.62); }
+
+        /* Résumé texte */
+        textarea.summary-area {
+            width: 100%;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.85rem;
+            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.7);
+            border-radius: 14px;
+            background: rgba(255,255,255,0.7);
+            color: #333;
+            resize: vertical;
+            outline: none;
+            margin-top: 12px;
+        }
+
+        /* Repli si le navigateur ne gère pas le flou */
+        @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            .section-card { background: rgba(255,255,255,0.92); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- EN-TETE : ANONYMISE -->
+    <div class="header-card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+            <h1>Bilan Neurocognitif</h1>
+            <button class="btn-reset" onclick="resetForm()">Réinitialiser</button>
+        </div>
+        <div class="grid-3" style="gap: 16px;">
+            <div>
+                <label style="color: rgba(255,255,255,0.8); font-size: 0.8rem; text-transform: uppercase;">Sexe</label>
+                <select id="pat_sexe" class="select-large" onchange="calcScores()">
+                    <option value="">Sélectionner</option>
+                    <option value="Femme">Femme</option>
+                    <option value="Homme">Homme</option>
+                </select>
+            </div>
+            <div>
+                <label style="color: rgba(255,255,255,0.8); font-size: 0.8rem; text-transform: uppercase;">Âge</label>
+                <select id="pat_age" class="select-large" onchange="calcScores()">
+                    <option value="">Sélectionner</option><option value="18">18 ans</option><option value="19">19 ans</option><option value="20">20 ans</option><option value="21">21 ans</option><option value="22">22 ans</option><option value="23">23 ans</option><option value="24">24 ans</option><option value="25">25 ans</option><option value="26">26 ans</option><option value="27">27 ans</option><option value="28">28 ans</option><option value="29">29 ans</option><option value="30">30 ans</option><option value="31">31 ans</option><option value="32">32 ans</option><option value="33">33 ans</option><option value="34">34 ans</option><option value="35">35 ans</option><option value="36">36 ans</option><option value="37">37 ans</option><option value="38">38 ans</option><option value="39">39 ans</option><option value="40">40 ans</option><option value="41">41 ans</option><option value="42">42 ans</option><option value="43">43 ans</option><option value="44">44 ans</option><option value="45">45 ans</option><option value="46">46 ans</option><option value="47">47 ans</option><option value="48">48 ans</option><option value="49">49 ans</option><option value="50">50 ans</option><option value="51">51 ans</option><option value="52">52 ans</option><option value="53">53 ans</option><option value="54">54 ans</option><option value="55">55 ans</option><option value="56">56 ans</option><option value="57">57 ans</option><option value="58">58 ans</option><option value="59">59 ans</option><option value="60">60 ans</option><option value="61">61 ans</option><option value="62">62 ans</option><option value="63">63 ans</option><option value="64">64 ans</option><option value="65">65 ans</option><option value="66">66 ans</option><option value="67">67 ans</option><option value="68">68 ans</option><option value="69">69 ans</option><option value="70">70 ans</option><option value="71">71 ans</option><option value="72">72 ans</option><option value="73">73 ans</option><option value="74">74 ans</option><option value="75">75 ans</option><option value="76">76 ans</option><option value="77">77 ans</option><option value="78">78 ans</option><option value="79">79 ans</option><option value="80">80 ans</option><option value="81">81 ans</option><option value="82">82 ans</option><option value="83">83 ans</option><option value="84">84 ans</option><option value="85">85 ans</option><option value="86">86 ans</option><option value="87">87 ans</option><option value="88">88 ans</option><option value="89">89 ans</option><option value="90">90 ans</option><option value="91">91 ans</option><option value="92">92 ans</option><option value="93">93 ans</option><option value="94">94 ans</option><option value="95">95 ans</option><option value="96">96 ans</option><option value="97">97 ans</option><option value="98">98 ans</option><option value="99">99 ans</option><option value="100">100 ans</option><option value="101">101 ans</option><option value="102">102 ans</option><option value="103">103 ans</option><option value="104">104 ans</option><option value="105">105 ans</option><option value="106">106 ans</option><option value="107">107 ans</option><option value="108">108 ans</option><option value="109">109 ans</option><option value="110">110 ans</option>
+                </select>
+            </div>
+            <div>
+                <label style="color: rgba(255,255,255,0.8); font-size: 0.8rem; text-transform: uppercase;">Niveau d'études</label>
+                <select id="pat_nsc" class="select-large" onchange="calcScores()">
+                    <option value="">Sélectionner</option>
+                    <option value="NSC 1 (Primaire)">NSC 1 (Primaire)</option>
+                    <option value="NSC 2 (Certificat/Brevet)">NSC 2 (Certificat/Brevet)</option>
+                    <option value="NSC 3 (Baccalauréat)">NSC 3 (Baccalauréat)</option>
+                    <option value="NSC 4 (Supérieur)">NSC 4 (Supérieur)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTEXTE CLINIQUE -->
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title">Contexte Clinique</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label style="font-size: 0.9rem; font-weight: 700; color: var(--text-main); display: block; margin-bottom: 12px;">Motifs de consultation :</label>
+            <label class="checkbox-card">
+                <input type="checkbox" class="motif-check" value="Atteinte de la mémoire antérograde" onchange="calcScores()">
+                <span><strong>Atteinte de la mémoire antérograde :</strong> Répétition des mêmes questions et oubli d'événements récents.</span>
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" class="motif-check" value="Désorientation spatio-temporelle" onchange="calcScores()">
+                <span><strong>Désorientation spatio-temporelle :</strong> Égarement lors de trajets familiers ou confusion sur les dates.</span>
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" class="motif-check" value="Syndrome dysexécutif" onchange="calcScores()">
+                <span><strong>Syndrome dysexécutif :</strong> Perte d'autonomie sur les tâches complexes (gestion financière, conduite automobile).</span>
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" class="motif-check" value="Troubles du langage" onchange="calcScores()">
+                <span><strong>Troubles du langage :</strong> Manque du mot persistant ou présence de paraphasies.</span>
+            </label>
+            <label class="checkbox-card">
+                <input type="checkbox" class="motif-check" value="Troubles psycho-comportementaux" onchange="calcScores()">
+                <span><strong>Troubles psycho-comportementaux :</strong> Apathie marquée, irritabilité soudaine ou modification de la personnalité.</span>
+            </label>
+        </div>
+
+        <div>
+            <label style="font-size: 0.9rem; font-weight: 700; color: var(--text-main); display: block; margin-bottom: 12px;">Évolution des troubles :</label>
+            <select id="evolution_select" class="select-large" onchange="calcScores()">
+                <option value="Non précisée">Sélectionner...</option>
+                <option value="Moins de 3 mois">Moins de 3 mois</option>
+                <option value="- 1 an (3 à 12 mois)">- 1 an</option>
+                <option value="Plus de 1 an">Plus de 1 an</option>
+            </select>
+        </div>
+        
+        <textarea id="comment_contexte" class="comment-box" rows="2" placeholder="Observations cliniques (optionnel)..." oninput="calcScores()"></textarea>
+    </div>
+
+    <!-- 1. AUTONOMIE : ADL & IADL -->
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title">1. Autonomie Fonctionnelle</div>
+            <div class="score-pill">ADL : <span id="disp_adl">6</span>/6 &nbsp;|&nbsp; IADL : <span id="disp_iadl">8</span>/8</div>
+        </div>
+        <div class="grid-2">
+            <!-- ADL -->
+            <div class="box-test">
+                <div class="box-title">Grille ADL (Katz /6)</div>
+                <div class="item-row"><span class="item-label">Hygiène</span><select class="adl-val" data-name="Hygiène" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0.5">0.5 - Aide</option><option value="0">0 - Dépendant</option></select></div>
+                <div class="item-row"><span class="item-label">Habillage</span><select class="adl-val" data-name="Habillage" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0.5">0.5 - Aide</option><option value="0">0 - Dépendant</option></select></div>
+                <div class="item-row"><span class="item-label">Toilettes</span><select class="adl-val" data-name="Toilettes" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0.5">0.5 - Aide</option><option value="0">0 - Dépendant</option></select></div>
+                <div class="item-row"><span class="item-label">Transferts</span><select class="adl-val" data-name="Transferts" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0.5">0.5 - Aide</option><option value="0">0 - Dépendant</option></select></div>
+                <div class="item-row"><span class="item-label">Continence</span><select class="adl-val" data-name="Continence" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Continent</option><option value="0.5">0.5 - Accidents</option><option value="0">0 - Incontinent</option></select></div>
+                <div class="item-row"><span class="item-label">Alimentation</span><select class="adl-val" data-name="Alimentation" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0.5">0.5 - Aide</option><option value="0">0 - Dépendant</option></select></div>
+            </div>
+
+            <!-- IADL -->
+            <div class="box-test">
+                <div class="box-title">Grille IADL (Lawton /8)</div>
+                <div class="item-row"><span class="item-label">Téléphone</span><select class="iadl-val" data-name="Téléphone" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0">0 - Incapable</option></select></div>
+                <div class="item-row"><span class="item-label">Courses</span><select class="iadl-val" data-name="Courses" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0">0 - Incapable</option></select></div>
+                <div class="item-row"><span class="item-label">Repas</span><select class="iadl-val" data-name="Repas" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0">0 - Incapable</option></select></div>
+                <div class="item-row"><span class="item-label">Ménage</span><select class="iadl-val" data-name="Ménage" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0">0 - Incapable</option></select></div>
+                <div class="item-row"><span class="item-label">Linge</span><select class="iadl-val" data-name="Linge" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0">0 - Incapable</option></select></div>
+                <div class="item-row"><span class="item-label">Transports</span><select class="iadl-val" data-name="Transports" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0">0 - Incapable</option></select></div>
+                <div class="item-row"><span class="item-label">Médicaments</span><select class="iadl-val" data-name="Médicaments" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0">0 - Incapable</option></select></div>
+                <div class="item-row"><span class="item-label">Finances</span><select class="iadl-val" data-name="Finances" data-default="1" onchange="calcScores()"><option value="1" selected>1 - Autonome</option><option value="0">0 - Incapable</option></select></div>
+            </div>
+        </div>
+        <textarea id="comment_autonomie" class="comment-box" rows="2" placeholder="Commentaire sur l'autonomie (optionnel)..." oninput="calcScores()"></textarea>
+    </div>
+
+    <!-- 2. MMSE -->
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title">2. MMSE (Folstein)</div>
+            <div class="score-pill">Total MMSE : <span id="disp_mmse">30</span>/30</div>
+        </div>
+        <div class="item-row"><span class="item-label">Orientation temporelle</span><select class="mmse-sub" data-name="orientation temporelle" data-max="5" data-default="5" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select></div>
+        <div class="item-row"><span class="item-label">Orientation spatiale</span><select class="mmse-sub" data-name="orientation spatiale" data-max="5" data-default="5" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select></div>
+        <div class="item-row"><span class="item-label">Apprentissage (3 mots)</span><select class="mmse-sub" data-name="apprentissage" data-max="3" data-default="3" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option></select></div>
+        <div class="item-row"><span class="item-label">Attention et calcul (100-7)</span><select class="mmse-sub" data-name="attention et calcul" data-max="5" data-default="5" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select></div>
+        <div class="item-row"><span class="item-label">Rappel différé</span><select class="mmse-sub" data-name="rappel différé" data-max="3" data-default="3" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option></select></div>
+        <div class="item-row"><span class="item-label">Langage - Dénomination</span><select class="mmse-sub" data-name="dénomination" data-max="2" data-default="2" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2" selected>2</option></select></div>
+        <div class="item-row"><span class="item-label">Langage - Répétition</span><select class="mmse-sub" data-name="répétition" data-max="1" data-default="1" onchange="calcScores()"><option value="0">0</option><option value="1" selected>1</option></select></div>
+        <div class="item-row"><span class="item-label">Langage - Ordre 3 temps</span><select class="mmse-sub" data-name="ordre en 3 temps" data-max="3" data-default="3" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option></select></div>
+        <div class="item-row"><span class="item-label">Langage - Lecture</span><select class="mmse-sub" data-name="lecture" data-max="1" data-default="1" onchange="calcScores()"><option value="0">0</option><option value="1" selected>1</option></select></div>
+        <div class="item-row"><span class="item-label">Langage - Écriture</span><select class="mmse-sub" data-name="écriture" data-max="1" data-default="1" onchange="calcScores()"><option value="0">0</option><option value="1" selected>1</option></select></div>
+        <div class="item-row"><span class="item-label">Praxies constructives</span><select class="mmse-sub" data-name="praxies constructives (pentagones)" data-max="1" data-default="1" onchange="calcScores()"><option value="0">0</option><option value="1" selected>1</option></select></div>
+        
+        <textarea id="comment_mmse" class="comment-box" rows="2" placeholder="Commentaire MMSE (optionnel)..." oninput="calcScores()"></textarea>
+    </div>
+
+    <!-- 3. DUBOIS -->
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title">3. Mémoire Épisodique (5 Mots de Dubois)</div>
+            <div class="score-pill">Total : <span id="disp_dubois">10</span>/10</div>
+        </div>
+        <div class="grid-2">
+            <div class="box-test">
+                <div class="box-title">Phase Immédiate</div>
+                <div class="item-row"><span class="item-label">Rappel Libre Immédiat (RLI)</span><select id="dub_rli" data-default="5" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select></div>
+                <div class="item-row"><span class="item-label">Rappel Indicé Immédiat (RII)</span><select id="dub_rii" data-default="0" onchange="calcScores()"><option value="0" selected>0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+            </div>
+            <div class="box-test">
+                <div class="box-title">Phase Différée</div>
+                <div class="item-row"><span class="item-label">Rappel Libre Différé (RLD)</span><select id="dub_rld" data-default="5" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select></div>
+                <div class="item-row"><span class="item-label">Rappel Indicé Différé (RID)</span><select id="dub_rid" data-default="0" onchange="calcScores()"><option value="0" selected>0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+            </div>
+        </div>
+        
+        <textarea id="comment_dubois" class="comment-box" rows="2" placeholder="Commentaire Dubois / profil (optionnel)..." oninput="calcScores()"></textarea>
+    </div>
+
+    <!-- 4. HORLOGE -->
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title">4. Test de l'Horloge</div>
+            <div class="score-pill">Score : <span id="disp_horloge">7</span>/7</div>
+        </div>
+        
+        <label class="checkbox-card"><input type="checkbox" class="clock-check" data-name="Contour fermé" checked onchange="calcScores()"><span>Le contour du cadran est dessiné et fermé.</span></label>
+        <label class="checkbox-card"><input type="checkbox" class="clock-check" data-name="12 chiffres présents" checked onchange="calcScores()"><span>Les 12 chiffres sont tous présents.</span></label>
+        <label class="checkbox-card"><input type="checkbox" class="clock-check" data-name="Ordre chronologique" checked onchange="calcScores()"><span>Les chiffres sont dans le bon ordre chronologique.</span></label>
+        <label class="checkbox-card"><input type="checkbox" class="clock-check" data-name="Disposition spatiale" checked onchange="calcScores()"><span>Les chiffres sont bien espacés et correctement positionnés.</span></label>
+        <label class="checkbox-card"><input type="checkbox" class="clock-check" data-name="Différenciation aiguilles" checked onchange="calcScores()"><span>Les deux aiguilles sont présentes et de longueur différente.</span></label>
+        <label class="checkbox-card"><input type="checkbox" class="clock-check" data-name="Heure sur le 11" checked onchange="calcScores()"><span>L'aiguille des heures pointe vers le 11.</span></label>
+        <label class="checkbox-card"><input type="checkbox" class="clock-check" data-name="Minutes sur le 2" checked onchange="calcScores()"><span>L'aiguille des minutes pointe vers le 2.</span></label>
+
+        
+        <textarea id="comment_horloge" class="comment-box" rows="2" placeholder="Commentaire Test de l'Horloge (optionnel)..." oninput="calcScores()"></textarea>
+    </div>
+
+    <!-- 5. BREF & FLUENCES -->
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title">5. Fonctions Exécutives (BREF & Fluences)</div>
+            <div class="score-pill">BREF : <span id="disp_bref">18</span>/18</div>
+        </div>
+        <div class="grid-2">
+            <div>
+                <div class="item-row"><span class="item-label">Similitudes</span><select class="bref-sub" data-name="similitudes" data-max="3" data-default="3" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option></select></div>
+                <div class="item-row"><span class="item-label">Fluence lexicale</span><select class="bref-sub" data-name="fluence lexicale" data-max="3" data-default="3" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option></select></div>
+                <div class="item-row"><span class="item-label">Séquence Luria</span><select class="bref-sub" data-name="séquence de Luria" data-max="3" data-default="3" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option></select></div>
+            </div>
+            <div>
+                <div class="item-row"><span class="item-label">Consignes contradictoires</span><select class="bref-sub" data-name="consignes contradictoires" data-max="3" data-default="3" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option></select></div>
+                <div class="item-row"><span class="item-label">Go/No-Go</span><select class="bref-sub" data-name="Go/No-Go" data-max="3" data-default="3" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option></select></div>
+                <div class="item-row"><span class="item-label">Préhension</span><select class="bref-sub" data-name="préhension" data-max="3" data-default="3" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option></select></div>
+            </div>
+        </div>
+        <div class="grid-2" style="margin-top: 16px;">
+            <div class="box-test">
+                <div class="box-title">Fluence Phonémique (Lettre S)</div>
+                <div class="item-row"><span class="item-label">Mots / min :</span><select id="flu_phon" data-default="12" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12" selected>12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="39">39</option><option value="40">40</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option><option value="49">49</option><option value="50">50</option></select></div>
+            </div>
+            <div class="box-test">
+                <div class="box-title">Fluence Sémantique (Animaux)</div>
+                <div class="item-row"><span class="item-label">Mots / min :</span><select id="flu_sem" data-default="16" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16" selected>16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="39">39</option><option value="40">40</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option><option value="49">49</option><option value="50">50</option></select></div>
+            </div>
+        </div>
+        
+        <textarea id="comment_bref" class="comment-box" rows="2" placeholder="Commentaire Fonctions Exécutives (optionnel)..." oninput="calcScores()"></textarea>
+    </div>
+
+    <!-- 6. PRAXIES -->
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title">6. Évaluation des Praxies</div>
+            <div class="score-pill">Préservées : <span id="disp_prax">5</span>/5</div>
+        </div>
+        <label class="checkbox-card"><input type="checkbox" class="prax-check" checked data-name="Symboliques" onchange="calcScores()"><span>Aucune atteinte : Praxies symboliques</span></label>
+        <label class="checkbox-card"><input type="checkbox" class="prax-check" checked data-name="Idéatoires" onchange="calcScores()"><span>Aucune atteinte : Praxies idéatoires</span></label>
+        <label class="checkbox-card"><input type="checkbox" class="prax-check" checked data-name="Imitation" onchange="calcScores()"><span>Aucune atteinte : Praxies d'imitation</span></label>
+        <label class="checkbox-card"><input type="checkbox" class="prax-check" checked data-name="Motrices" onchange="calcScores()"><span>Aucune atteinte : Praxies motrices</span></label>
+        <label class="checkbox-card"><input type="checkbox" class="prax-check" checked data-name="Constructives" onchange="calcScores()"><span>Aucune atteinte : Praxies constructives</span></label>
+        
+        <textarea id="comment_praxies" class="comment-box" rows="2" placeholder="Commentaire Praxies (optionnel)..." oninput="calcScores()"></textarea>
+    </div>
+
+    <!-- 7. LAST-B -->
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title">7. LAST-B (Langage)</div>
+            <div class="score-pill">Total : <span id="disp_lastb">23</span>/23</div>
+        </div>
+        <div class="grid-2">
+            <div class="score-counter-card">
+                <div style="font-size: 0.9rem; font-weight: 700; color: var(--primary);">Expression orale</div>
+                <div class="score-counter-val"><span id="disp_last_exp">8</span> / 8</div>
+                <select id="last_exp" class="select-large" data-default="8" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8" selected>8</option></select>
+            </div>
+            <div class="score-counter-card">
+                <div style="font-size: 0.9rem; font-weight: 700; color: var(--primary);">Compréhension orale</div>
+                <div class="score-counter-val"><span id="disp_last_comp">15</span> / 15</div>
+                <select id="last_comp" class="select-large" data-default="15" onchange="calcScores()"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15" selected>15</option></select>
+            </div>
+        </div>
+        
+        <textarea id="comment_lastb" class="comment-box" rows="2" placeholder="Commentaire Langage / LAST-B (optionnel)..." oninput="calcScores()"></textarea>
+    </div>
+
+    <!-- 8. TMT A & B -->
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title">8. Trail Making Test (TMT A & B)</div>
+        </div>
+        <div class="grid-2">
+            <div class="box-test">
+                <div class="box-title">TMT A</div>
+                <div class="item-row">
+                    <span class="item-label">Temps (secondes) :</span>
+                    <input type="number" min="0" class="num-input" id="tmt_a_time" placeholder="sec" oninput="calcScores()">
+                </div>
+                <div class="item-row">
+                    <span class="item-label">Erreurs :</span>
+                    <input type="number" min="0" class="num-input" id="tmt_a_err" value="0" oninput="calcScores()">
+                </div>
+            </div>
+            <div class="box-test">
+                <div class="box-title">TMT B</div>
+                <div class="item-row">
+                    <span class="item-label">Temps (secondes) :</span>
+                    <input type="number" min="0" class="num-input" id="tmt_b_time" placeholder="sec" oninput="calcScores()">
+                </div>
+                <div class="item-row">
+                    <span class="item-label">Erreurs :</span>
+                    <input type="number" min="0" class="num-input" id="tmt_b_err" value="0" oninput="calcScores()">
+                </div>
+            </div>
+        </div>
+        
+        <textarea id="comment_tmt" class="comment-box" rows="2" placeholder="Commentaire TMT (optionnel)..." oninput="calcScores()"></textarea>
+    </div>
+
+    <!-- 9. ECHELLE DE HAMILTON -->
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title">9. Échelle de Hamilton (Dépression)</div>
+            <div class="score-pill">Score : <span id="disp_hamilton">0</span></div>
+        </div>
+        <div class="item-row">
+            <span class="item-label"><strong>Score total HDRS</strong> (Évaluation de l'humeur) :</span>
+            <select id="hamilton_score" data-default="0" onchange="calcScores()"><option value="0" selected>0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="39">39</option><option value="40">40</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option><option value="49">49</option><option value="50">50</option><option value="51">51</option><option value="52">52</option></select>
+        </div>
+        
+        <textarea id="comment_hamilton" class="comment-box" rows="2" placeholder="Commentaire Humeur / Hamilton (optionnel)..." oninput="calcScores()"></textarea>
+    </div>
+
+    <!-- RESUME -->
+    <div class="section-card summary-card">
+        <div class="section-header" style="border-bottom: none; margin-bottom: 0;">
+            <div class="section-title" style="color: var(--primary);">Résumé pour le dossier patient</div>
+            <div id="copy_controls" style="display:flex; align-items:center; gap:12px; flex-wrap: wrap;">
+                <label style="font-size: 0.9rem; font-weight:600; display:flex; align-items:center; cursor:pointer;">
+                    <input type="checkbox" id="toggle_comments" checked onchange="calcScores()" style="width:18px; height:18px; margin-right:6px; accent-color: var(--primary);">
+                    Inclure les commentaires
+                </label>
+                <button class="btn btn-success" id="copy_btn" onclick="copyResults()">Copier le texte</button>
+                <button class="btn btn-danger" id="download_pdf_btn" onclick="downloadSummaryPDF()">
+                    <svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                    Enregistrer en PDF
+                </button>
+            </div>
+        </div>
+        <textarea id="result_summary" class="summary-area" rows="28" readonly></textarea>
+    </div>
+
+</div>
+
+<script>
+    function resetForm() {
+        if(!confirm("Êtes-vous sûr de vouloir tout effacer et réinitialiser le bilan ?")) return;
+
+        document.getElementById('pat_sexe').selectedIndex = 0;
+        document.getElementById('pat_age').selectedIndex = 0;
+        document.getElementById('pat_nsc').selectedIndex = 0;
+        document.getElementById('evolution_select').selectedIndex = 0;
+
+        document.querySelectorAll('.motif-check').forEach(el => el.checked = false);
+
+        document.querySelectorAll('select[data-default]').forEach(sel => {
+            sel.value = sel.getAttribute('data-default');
+        });
+
+        document.querySelectorAll('.num-input').forEach(el => {
+            if (el.id.includes('err')) el.value = "0";
+            else el.value = "";
+        });
+
+        document.querySelectorAll('.clock-check').forEach(el => el.checked = true);
+        document.querySelectorAll('.prax-check').forEach(el => el.checked = true);
+
+        document.querySelectorAll('.comment-box').forEach(el => el.value = "");
+        
+        document.getElementById('toggle_comments').checked = true;
+
+        calcScores();
+        window.scrollTo(0,0);
+    }
+
+    function calcScores() {
+        let withComments = document.getElementById('toggle_comments').checked;
+
+        function fmtCmt(id) {
+            let el = document.getElementById(id);
+            if (!el) return '';
+            let val = el.value.trim();
+            return (withComments && val) ? `\n   > Commentaire : ${val}` : '';
+        }
+
+        // Patient
+        let sexeEl = document.getElementById('pat_sexe');
+        let sexe = (sexeEl && sexeEl.value) ? sexeEl.value : "Non précisé";
+        let ageEl = document.getElementById('pat_age');
+        let age = (ageEl && ageEl.value) ? ageEl.value + " ans" : "Non précisé";
+        let nscEl = document.getElementById('pat_nsc');
+        let nsc = (nscEl && nscEl.value) ? nscEl.value : "Non précisé";
+
+        // Contexte
+        let motifsArr = [];
+        document.querySelectorAll('.motif-check').forEach(el => {
+            if(el.checked) motifsArr.push(el.value);
+        });
+        let motifsText = motifsArr.length > 0 ? motifsArr.join(', ') : "Non précisés";
+        let evolEl = document.getElementById('evolution_select');
+        let evolution = (evolEl && evolEl.value) ? evolEl.value : "Non précisée";
+
+        // ADL
+        let adlSum = 0;
+        let adlLost = [];
+        document.querySelectorAll('.adl-val').forEach(el => {
+            let val = parseFloat(el.value || 0);
+            if (isNaN(val)) val = 0;
+            adlSum += val;
+            let name = el.getAttribute('data-name');
+            if (val < 1) {
+                adlLost.push(`${name} (${val === 0 ? 'dépendance totale' : 'aide partielle, -0.5 pt'})`);
+            }
+        });
+        document.getElementById('disp_adl').textContent = adlSum;
+        let adlDetailStr = adlLost.length > 0 ? `\n   Points perdus / aides : ${adlLost.join(', ')}` : " (aucune dépendance)";
+
+        // IADL
+        let iadlSum = 0;
+        let iadlLost = [];
+        document.querySelectorAll('.iadl-val').forEach(el => {
+            let val = parseInt(el.value || 0, 10);
+            if (isNaN(val)) val = 0;
+            iadlSum += val;
+            let name = el.getAttribute('data-name');
+            if (val === 0) {
+                iadlLost.push(`${name} (-1 pt)`);
+            }
+        });
+        document.getElementById('disp_iadl').textContent = iadlSum;
+        let iadlDetailStr = iadlLost.length > 0 ? `\n   Points perdus / incapacités : ${iadlLost.join(', ')}` : " (autonomie préservée)";
+
+        // MMSE
+        let mmseSum = 0;
+        let mmseLost = [];
+        document.querySelectorAll('.mmse-sub').forEach(el => {
+            let val = parseInt(el.value || 0, 10);
+            if (isNaN(val)) val = 0;
+            let max = parseInt(el.getAttribute('data-max'), 10) || val;
+            let name = el.getAttribute('data-name');
+            mmseSum += val;
+            if (val < max) {
+                let lost = max - val;
+                mmseLost.push(`${lost} pt${lost > 1 ? 's' : ''} à : ${name}`);
+            }
+        });
+        document.getElementById('disp_mmse').textContent = mmseSum;
+        let mmseDetailStr = mmseLost.length > 0 ? `\n   Points perdus : ${mmseLost.join(', ')}` : " (aucun point perdu)";
+
+        // Dubois - Validation dynamique des options pour max 5 par phase
+        let rliEl = document.getElementById('dub_rli');
+        let riiEl = document.getElementById('dub_rii');
+        let rldEl = document.getElementById('dub_rld');
+        let ridEl = document.getElementById('dub_rid');
+        
+        let rli = parseInt(rliEl.value || 0, 10);
+        let currentRii = parseInt(riiEl.value || 0, 10);
+        let rld = parseInt(rldEl.value || 0, 10);
+        let currentRid = parseInt(ridEl.value || 0, 10);
+        
+        if (isNaN(rli)) rli = 0; if (isNaN(currentRii)) currentRii = 0; 
+        if (isNaN(rld)) rld = 0; if (isNaN(currentRid)) currentRid = 0;
+
+        // Limiter RII à (5 - RLI)
+        let maxRii = 5 - rli;
+        if (currentRii > maxRii) currentRii = maxRii;
+        riiEl.innerHTML = '';
+        for(let i=0; i<=maxRii; i++) {
+            riiEl.add(new Option(i, i, false, i === currentRii));
+        }
+
+        // Limiter RID à (5 - RLD)
+        let maxRid = 5 - rld;
+        if (currentRid > maxRid) currentRid = maxRid;
+        ridEl.innerHTML = '';
+        for(let i=0; i<=maxRid; i++) {
+            ridEl.add(new Option(i, i, false, i === currentRid));
+        }
+
+        let rii = currentRii;
+        let rid = currentRid;
+        let dubTotal = rli + rii + rld + rid; // Max 10
+        document.getElementById('disp_dubois').textContent = dubTotal;
+        
+        let dubLost = [];
+        if (rli < 5) dubLost.push(`${5 - rli} pt(s) au rappel libre immédiat`);
+        if (rld < 5) dubLost.push(`${5 - rld} pt(s) au rappel libre différé`);
+        let dubDetailStr = dubLost.length > 0 ? `\n   Déficit de rappel libre : ${dubLost.join(', ')}` : "";
+
+        // Horloge
+        let clock = 0;
+        let clockLost = [];
+        document.querySelectorAll('.clock-check').forEach(el => {
+            if(el.checked) {
+                clock++;
+            } else {
+                clockLost.push(el.getAttribute('data-name') || "Critère non validé");
+            }
+        });
+        document.getElementById('disp_horloge').textContent = clock;
+        let clockDetailStr = clockLost.length > 0 ? `\n   Points perdus / erreurs : ${clockLost.join(', ')}` : " (tracé parfait)";
+
+        // BREF
+        let bref = 0;
+        let brefLost = [];
+        document.querySelectorAll('.bref-sub').forEach(el => {
+            let val = parseInt(el.value || 0, 10);
+            if (isNaN(val)) val = 0;
+            let max = parseInt(el.getAttribute('data-max'), 10) || 3;
+            let name = el.getAttribute('data-name');
+            bref += val;
+            if (val < max) {
+                let lost = max - val;
+                brefLost.push(`${lost} pt${lost > 1 ? 's' : ''} à : ${name}`);
+            }
+        });
+        document.getElementById('disp_bref').textContent = bref;
+        let brefDetailStr = brefLost.length > 0 ? `\n   Points perdus : ${brefLost.join(', ')}` : " (aucun point perdu)";
+
+        // Fluences
+        let fluPhon = document.getElementById('flu_phon').value || "0";
+        let fluSem = document.getElementById('flu_sem').value || "0";
+
+        // Praxies
+        let praxCount = 0;
+        let praxDetails = [];
+        document.querySelectorAll('.prax-check').forEach(el => {
+            if(el.checked) {
+                praxCount++;
+                praxDetails.push(el.dataset.name + ": OK");
+            } else {
+                praxDetails.push(el.dataset.name + ": Atteinte");
+            }
+        });
+        document.getElementById('disp_prax').textContent = praxCount;
+
+        // LAST-B
+        let lastExp = parseInt(document.getElementById('last_exp').value || 0, 10);
+        let lastComp = parseInt(document.getElementById('last_comp').value || 0, 10);
+        if (isNaN(lastExp)) lastExp = 0; if (isNaN(lastComp)) lastComp = 0;
+        document.getElementById('disp_last_exp').textContent = lastExp;
+        document.getElementById('disp_last_comp').textContent = lastComp;
+        document.getElementById('disp_lastb').textContent = lastExp + lastComp;
+        let lastLost = [];
+        if (lastExp < 8) lastLost.push(`${8 - lastExp} pt(s) en expression`);
+        if (lastComp < 15) lastLost.push(`${15 - lastComp} pt(s) en compréhension`);
+        let lastDetailStr = lastLost.length > 0 ? `\n   Points perdus : ${lastLost.join(', ')}` : "";
+
+        // TMT
+        let tmtATime = document.getElementById('tmt_a_time').value.trim() || "NR";
+        let tmtAErr = document.getElementById('tmt_a_err').value.trim() || "0";
+        let tmtBTime = document.getElementById('tmt_b_time').value.trim() || "NR";
+        let tmtBErr = document.getElementById('tmt_b_err').value.trim() || "0";
+
+        // Hamilton
+        let hamilton = parseInt(document.getElementById('hamilton_score').value || 0, 10);
+        if (isNaN(hamilton)) hamilton = 0;
+        document.getElementById('disp_hamilton').textContent = hamilton;
+
+        // Synthèse Patient
+        let text = `Patient(e) : ${sexe} | Âge : ${age} | Études : ${nsc}
+
+0. CONTEXTE CLINIQUE
+- Motifs : ${motifsText}
+- Évolution : ${evolution}${fmtCmt('comment_contexte')}
+
+1. AUTONOMIE FONCTIONNELLE
+- ADL : ${adlSum}/6${adlDetailStr}
+- IADL : ${iadlSum}/8${iadlDetailStr}${fmtCmt('comment_autonomie')}
+
+2. ÉVALUATION GLOBALE
+- MMSE : ${mmseSum}/30${mmseDetailStr}${fmtCmt('comment_mmse')}
+
+3. MÉMOIRE ÉPISODIQUE (Dubois)
+- Rappel Libre Immédiat : ${rli}/5
+- Rappel Libre Différé : ${rld}/5
+- Rappel Indicé Immédiat : ${rii}/5
+- Rappel Indicé Différé : ${rid}/5
+- Total : ${dubTotal}/10${dubDetailStr}${fmtCmt('comment_dubois')}
+
+4. FONCTIONS EXÉCUTIVES & VISUO-SPATIALES
+- Horloge : ${clock}/7${clockDetailStr}${fmtCmt('comment_horloge')}
+- BREF : ${bref}/18${brefDetailStr}
+- Fluence Phonémique (S) : ${fluPhon} mots
+- Fluence Sémantique (Animaux) : ${fluSem} mots${fmtCmt('comment_bref')}
+- TMT A : ${tmtATime} sec (${tmtAErr} err)
+- TMT B : ${tmtBTime} sec (${tmtBErr} err)${fmtCmt('comment_tmt')}
+
+5. PRAXIES
+- ${praxCount}/5 praxies préservées (${praxDetails.join(', ')})${fmtCmt('comment_praxies')}
+
+6. LANGAGE (LAST-B)
+- Expression orale : ${lastExp}/8
+- Compréhension orale : ${lastComp}/15
+- Total : ${lastExp + lastComp}/23${lastDetailStr}${fmtCmt('comment_lastb')}
+
+7. ÉVALUATION DE L'HUMEUR
+- Score de Hamilton (HDRS) : ${hamilton}/52${fmtCmt('comment_hamilton')}
+`;
+        
+        let ta = document.getElementById('result_summary');
+        ta.value = text;
+        ta.style.height = "auto";
+        ta.style.height = (ta.scrollHeight + 10) + "px";
+    }
+
+    function copyResults() {
+        let ta = document.getElementById("result_summary");
+        let textToCopy = ta.value;
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(textToCopy).then(showCopiedNotice).catch(fallbackCopy);
+        } else {
+            fallbackCopy();
+        }
+
+        function fallbackCopy() {
+            ta.focus();
+            ta.select();
+            try {
+                document.execCommand('copy');
+                showCopiedNotice();
+            } catch (err) {
+                alert("Erreur lors de la copie.");
+            }
+            if (window.getSelection) {
+                window.getSelection().removeAllRanges();
+            }
+        }
+
+        function showCopiedNotice() {
+            let btn = document.getElementById("copy_btn");
+            let orig = btn.innerText;
+            btn.innerText = "Copié !";
+            btn.style.background = "#059669";
+            setTimeout(() => {
+                btn.innerText = orig;
+                btn.style.background = "";
+            }, 2000);
+        }
+    }
+
+    /* =========================================================================
+       GÉNÉRATEUR PDF BINAIRE STRICT ISO-8859-1 (SANS BOGUE D'ENCODAGE UTF-8)
+       ========================================================================= */
+    function downloadSummaryPDF() {
+        calcScores();
+        let summaryText = document.getElementById('result_summary').value;
+        let todayStr = new Date().toLocaleDateString('fr-FR');
+        let filenameDate = new Date().toISOString().slice(0,10);
+
+        // Convertit du texte JS avec accents français en chaîne d'échappement octale PDF (\ooo)
+        function toPDFString(str) {
+            // Nettoyage des apostrophes et tirets typographiques vers ASCII/Latin1 standard
+            let s = str
+                .replace(/[\u2018\u2019]/g, "'")
+                .replace(/[\u201C\u201D]/g, '"')
+                .replace(/[\u2013\u2014]/g, "-")
+                .replace(/[\u2026]/g, "...")
+                .replace(/œ/g, "oe")
+                .replace(/Œ/g, "OE");
+
+            let res = "";
+            for (let i = 0; i < s.length; i++) {
+                let code = s.charCodeAt(i);
+                if (code === 92) res += "\\\\";       // Backslash
+                else if (code === 40) res += "\\(";  // (
+                else if (code === 41) res += "\\)";  // )
+                else if (code >= 32 && code <= 126) {
+                    res += s.charAt(i);
+                } else if (code >= 128 && code <= 255) {
+                    // Notation octale reconnue par tous les moteurs PDF sans corruption
+                    res += "\\" + code.toString(8).padStart(3, "0");
+                } else {
+                    res += " ";
+                }
+            }
+            return "(" + res + ")";
+        }
+
+        // Configuration A4 (595.28 x 841.89 pt)
+        const pageWidth = 595.28;
+        const pageHeight = 841.89;
+        const maxCharsPerLine = 84;
+        let rawLines = summaryText.split('\n');
+        let formattedLines = [];
+
+        for (let l of rawLines) {
+            if (l.length <= maxCharsPerLine) {
+                formattedLines.push(l);
+            } else {
+                let words = l.split(' ');
+                let cur = '';
+                for (let w of words) {
+                    if ((cur + (cur ? ' ' : '') + w).length <= maxCharsPerLine) {
+                        cur += (cur ? ' ' : '') + w;
+                    } else {
+                        if (cur) formattedLines.push(cur);
+                        cur = (w.length > maxCharsPerLine) ? w.substring(0, maxCharsPerLine) : w;
+                    }
+                }
+                if (cur) formattedLines.push(cur);
+            }
+        }
+
+        // Pagination : ~48 lignes par page A4 avec un interligne de 13.5pt
+        const lineHeight = 13.8;
+        const linesPerPage = 48;
+        let pages = [];
+        for (let i = 0; i < formattedLines.length; i += linesPerPage) {
+            pages.push(formattedLines.slice(i, i + linesPerPage));
+        }
+        if (pages.length === 0) pages.push([]);
+        let totalPages = pages.length;
+
+        // Écriture du flux binaire structuré
+        let chunks = [];
+        function write(str) {
+            let bytes = new Uint8Array(str.length);
+            for (let i = 0; i < str.length; i++) {
+                bytes[i] = str.charCodeAt(i) & 0xff;
+            }
+            chunks.push(bytes);
+        }
+
+        write("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
+
+        let offsets = [];
+        function startObject(id) {
+            let currentOffset = 0;
+            for (let c of chunks) currentOffset += c.length;
+            offsets[id] = currentOffset;
+            write(`${id} 0 obj\n`);
+        }
+        function endObject() {
+            write("endobj\n");
+        }
+
+        // IDs d'objets
+        const catId = 1;
+        const pagesId = 2;
+        const fontHelvId = 3;
+        const fontCourBoldId = 4;
+        const fontCourId = 5;
+
+        let pageObjIds = [];
+        let curId = 6;
+        for (let p = 0; p < totalPages; p++) {
+            pageObjIds.push({ pageId: curId++, contentId: curId++ });
+        }
+
+        // 1. Catalog
+        startObject(catId);
+        write(`<< /Type /Catalog /Pages ${pagesId} 0 R >>\n`);
+        endObject();
+
+        // 2. Pages tree
+        startObject(pagesId);
+        let kids = pageObjIds.map(p => `${p.pageId} 0 R`).join(' ');
+        write(`<< /Type /Pages /Kids [${kids}] /Count ${totalPages} >>\n`);
+        endObject();
+
+        // 3, 4, 5. Polices standard avec encodage WinAnsiEncoding natif
+        startObject(fontHelvId);
+        write(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>\n`);
+        endObject();
+
+        startObject(fontCourBoldId);
+        write(`<< /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >>\n`);
+        endObject();
+
+        startObject(fontCourId);
+        write(`<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>\n`);
+        endObject();
+
+        // Pages et Contenus
+        for (let i = 0; i < totalPages; i++) {
+            let p = pageObjIds[i];
+            let pageLines = pages[i];
+            let pageNum = i + 1;
+
+            // Définition de la page
+            startObject(p.pageId);
+            write(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Contents ${p.contentId} 0 R /Resources << /Font << /F1 ${fontHelvId} 0 R /F2 ${fontCourBoldId} 0 R /F3 ${fontCourId} 0 R >> >> >>\n`);
+            endObject();
+
+            // Construction du flux de tracé
+            let stream = "";
+            
+            // Filet d'en-tête bleu médical
+            stream += `q 0.05 0.45 0.88 rg 40 ${pageHeight - 44} 515 2 re f Q\n`;
+            
+            // Titre & date
+            stream += `BT\n/F1 12 Tf\n0.08 0.12 0.20 rg\n40 ${pageHeight - 36} Td\n${toPDFString("BILAN NEUROCOGNITIF - SYNTHÈSE MÉDICALE")} Tj\nET\n`;
+            stream += `BT\n/F3 9 Tf\n0.40 0.45 0.52 rg\n470 ${pageHeight - 36} Td\n${toPDFString(todayStr)} Tj\nET\n`;
+
+            // Lignes du compte rendu
+            stream += `BT\n40 ${pageHeight - 68} Td\n`;
+            for (let lineIdx = 0; lineIdx < pageLines.length; lineIdx++) {
+                let line = pageLines[lineIdx];
+                let isTitle = /^[0-9]\./.test(line) || line.startsWith("Patient(e) :");
+                
+                if (isTitle) {
+                    stream += `/F2 9.5 Tf\n0.05 0.15 0.30 rg\n`;
+                } else {
+                    stream += `/F3 9.0 Tf\n0.12 0.15 0.20 rg\n`;
+                }
+
+                stream += `${toPDFString(line)} Tj\n`;
+                if (lineIdx < pageLines.length - 1) {
+                    stream += `0 -${lineHeight} Td\n`;
+                }
+            }
+            stream += `ET\n`;
+
+            // Pied de page
+            stream += `BT\n/F3 8 Tf\n0.55 0.60 0.65 rg\n40 24 Td\n${toPDFString("Dossier Patient - Évaluation gériatrique et cognitive")} Tj\nET\n`;
+            stream += `BT\n/F3 8 Tf\n0.55 0.60 0.65 rg\n505 24 Td\n${toPDFString(pageNum + " / " + totalPages)} Tj\nET\n`;
+
+            // Écriture de l'objet contenu avec comptage exact d'octets
+            startObject(p.contentId);
+            write(`<< /Length ${stream.length} >>\nstream\n`);
+            write(stream);
+            write("\nendstream\n");
+            endObject();
+        }
+
+        // Table XREF
+        let xrefOffset = 0;
+        for (let c of chunks) xrefOffset += c.length;
+
+        let totalObjs = (totalPages * 2) + 5;
+        write(`xref\n0 ${totalObjs + 1}\n`);
+        write("0000000000 65535 f \n");
+        for (let objId = 1; objId <= totalObjs; objId++) {
+            let off = (offsets[objId] || 0).toString().padStart(10, '0');
+            write(`${off} 00000 n \n`);
+        }
+        write(`trailer\n<< /Size ${totalObjs + 1} /Root ${catId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
+
+        // Création du Blob et téléchargement
+        let blob = new Blob(chunks, { type: 'application/pdf' });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = `Bilan_Neurocognitif_${filenameDate}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 300);
+
+        let btn = document.getElementById("download_pdf_btn");
+        let origHtml = btn.innerHTML;
+        btn.innerHTML = `✓ Téléchargé !`;
+        setTimeout(() => {
+            btn.innerHTML = origHtml;
+        }, 2000);
+    }
+
+    // Exécution immédiate et systématique
+    calcScores();
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', calcScores);
+    }
+    window.addEventListener('load', calcScores);
+</script>
+
+</body>
+</html>
